@@ -91,7 +91,7 @@ router.put('/:id', async function(req, res) { // Update a profile
 router.delete('/:id', async function(req, res) { // Delete a profile
     try {
         const { id } = req.params;
-        const destroyedProfile = await Profiles.destroy({
+        await Profiles.destroy({
             where: {
                 id
             }

@@ -21,7 +21,7 @@ Tutors.belongsTo(Profiles); // A tutor must belong to a profile
 Tutors.hasMany(Sessions); // A tutor can have a bunch of sessions
 Students.hasMany(Sessions); // A student can have a bunch of sessions
 
-sequelize.sync({ force: true, });
+sequelize.sync({ force: false, });
 console.log('Tables synced successfully');
 
 module.exports = {
