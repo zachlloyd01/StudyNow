@@ -8,19 +8,35 @@ router.post('/', async function(req, res) { // Create new profile
     try { // Error handling
         const storePassword = await bcrypt.hash(req.body.password, 10);
     
-        const newProfile = await Profiles.create({
-            name: req.body.name,
-            email: req.body.email,
-            password: storePassword,
+        const [newProfile, created] = await Profiles.findOrCreate({
+            where: {
+                email: req.body.email
+            },
+            defaults: {
+                name: req.body.name,
+                email: req.body.email,
+                password: storePassword,
+            }
         });
 
-        res.status(200).json({id: newProfile.id, email: newProfile.email, name: newProfile.name});
+        if(!created) {
+            const match = await bcrypt.compare(req.body.password, newProfile.password);
+            if(match) {
+                res.status(200).json({id: newProfile.id, email: newProfile.email, name: newProfile.name, created});
+            }
+            else {
+                res.status(403).json('Incorrect Password');
+            }
+        }
+        else {
+            res.status(200).json({id: newProfile.id, email: newProfile.email, name: newProfile.name, created});
+        }
+        
     }
     catch(err) { // If it errors, respond with an error
         console.log(err);
         res.status(500).json(err);
-    }
-    
+    } 
 });
 
 router.get('/', async function(req, res) { // Retrieve all profiles
@@ -35,19 +51,49 @@ router.get('/', async function(req, res) { // Retrieve all profiles
 });
 
 router.get('/:id', async function(req, res) { // Retrieve a specific profile
-    const { id } = req.params;
-    const foundProfile = await Profiles.scope('withoutPassword').findOne({ where: { id }});
-    res.status(200).json(foundProfile)
+    try {
+        const { id } = req.params;
+        const foundProfile = await Profiles.scope('withoutPassword').findOne({ where: { id }});
+        res.status(200).json(foundProfile)
+    } 
+    catch (error) {
+        res.status(500).json(error);
+    }
+    
 });
 
 router.put('/:id', async function(req, res) { // Update a profile
-    const { id } = req.params;
-    res.status(200).json('Update a profile!');
+    try {
+        const { id } = req.params;
+        const updatedProfile = await Profiles.update(
+            req.body,
+            { where: { id } }
+        );
+        res.status(200).json({ 
+            id: updatedProfile.id, 
+            name: updatedProfile, 
+            email: updatedProfile.email 
+        });
+    } 
+    catch (error) {
+        res.status(500).json(error);
+    }
+    
 });
 
 router.delete('/:id', async function(req, res) { // Delete a profile
-    const { id } = req.params;
-    res.status(200).json(`Delete a profile! ${id}`)
+    try {
+        const { id } = req.params;
+        const destroyedProfile = await Profiles.destroy({
+            where: {
+                id
+            }
+        });
+        res.status(202).json('')
+    }
+    catch(err) {
+        res.status(500).json(err);
+    }
 });
 
 module.exports = router;

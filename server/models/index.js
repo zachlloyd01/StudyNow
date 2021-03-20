@@ -1,16 +1,16 @@
 const Sequelize = require('sequelize');
 const profile = require('./profile');
 
-const sequelize = new Sequelize('studynow', 'root', 'H@rleythed0g', {
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
     dialect: 'mysql',
-    host: 'localhost',
-    port: 3306,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
     logging: false,
 });
 
 const Profiles = require('./profile')(sequelize);
 
-sequelize.sync({ force: true, }); //hello
+sequelize.sync({ force: false, });
 console.log('Tables synced successfully');
 
 module.exports = {
