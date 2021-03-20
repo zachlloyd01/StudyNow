@@ -4,7 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Run locally
 
-In the project directory, you can run:
+In the client project directory, you can run:
 
 ### `npm run dev`
 
