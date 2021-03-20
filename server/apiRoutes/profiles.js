@@ -3,6 +3,7 @@
 const router = require('express').Router();
 const { Profiles } = require('../models');
 const bcrypt = require('bcrypt');
+const { ValidationError } = require('sequelize');
 
 router.post('/', async function(req, res) { // Create new profile
     try { // Error handling
@@ -34,8 +35,14 @@ router.post('/', async function(req, res) { // Create new profile
         
     }
     catch(err) { // If it errors, respond with an error
-        console.log(err);
-        res.status(500).json(err);
+        if(err instanceof ValidationError) {
+            // Returns "profile.name" if trying to sign into nonexistent account
+            res.status(400).json(err.errors[0]['message'].split(' ')[0]);
+        }
+        else {
+            res.status(500).json(err);
+        }
+        
     } 
 });
 
