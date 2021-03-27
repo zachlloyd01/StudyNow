@@ -15,15 +15,6 @@ module.exports = function(sequelize) {
           type: DataTypes.STRING,
           allowNull: false
         }
-      },
-      {
-        scopes: {
-            withoutPassword: {
-                attributes: { exclude: ['password'] }
-            }
-        }
-      }
-    );
-
+      });
       return Profile;
 }
