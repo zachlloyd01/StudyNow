@@ -1,49 +1,54 @@
 'use strict'
 
 const router = require('express').Router();
-const { Profiles } = require('../models');
+const { Profiles, Students, Tutors } = require('../models');
 const bcrypt = require('bcrypt');
 const { ValidationError } = require('sequelize');
 
 router.post('/', async function(req, res) { // Create new profile
-    try { // Error handling
-        const storePassword = await bcrypt.hash(req.body.password, 10);
-    
-        const [newProfile, created] = await Profiles.findOrCreate({
-            where: {
-                email: req.body.email
-            },
-            defaults: {
-                name: req.body.name,
-                email: req.body.email,
-                password: storePassword,
-            }
+    if(req.body.name) { // Is a signup
+        try {
+            const storePassword = await bcrypt.hash(req.body.password, 10);
+            const newProfile = await Profiles.scope('withoutPassword').create({
+            name: req.body.name,
+            email: req.body.email,
+            password: storePassword   
         });
-
-        if(!created) {
-            const match = await bcrypt.compare(req.body.password, newProfile.password);
-            if(match) {
-                res.status(200).json({id: newProfile.id, email: newProfile.email, name: newProfile.name, created});
-            }
-            else {
-                res.status(403).json('Incorrect Password');
-            }
+        res.status(200).json(newProfile);
         }
-        else {
-            res.status(200).json({id: newProfile.id, email: newProfile.email, name: newProfile.name, created});
-        }
-        
-    }
-    catch(err) { // If it errors, respond with an error
-        if(err instanceof ValidationError) {
-            // Returns "profile.name" if trying to sign into nonexistent account
-            res.status(400).json(err.errors[0]['message'].split(' ')[0]);
-        }
-        else {
+        catch(err){
+            console.log(err);
             res.status(500).json(err);
         }
-        
-    } 
+    }
+    else { // Is a login
+        try {
+            const foundProfile = await Profiles.findOne({
+                where: {
+                    email: req.body.email
+                }
+            });
+
+            if(foundProfile) {
+                const match = await bcrypt.compare(req.body.password, foundProfile.password);
+                if(match) {
+                    res.status(200).json({ id: foundProfile.id, name: foundProfile.name, email: foundProfile.email });
+                }
+                else {
+                    res.status(401).json('Unauthorized');
+                }
+            }
+            else {
+                res.status(404).json('Profile not found');
+            }
+            
+            
+        }
+        catch(err){
+            console.log(err);
+            res.status(500).json(err);
+        }
+    }
 });
 
 router.get('/', async function(req, res) { // Retrieve all profiles
