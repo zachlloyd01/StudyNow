@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export default function NavBar(props) {
 
-    const [value, setValue] = useState(0);
+    const [value, setValue] = useState(window.location.pathname);
 
     const handleTabChange = (e, newValue) => {
         setValue(newValue);
@@ -20,9 +20,9 @@ export default function NavBar(props) {
                     onChange={handleTabChange}
                     style = {{ marginLeft: 'auto' }}
                 >
-                    <Tab to="/" label="Home" component={Link} />
-                    <Tab to="/signup" label="Signup" component={Link} />
-                    <Tab to="/login" label="Login" component={Link} />
+                    <Tab to="/" label="Home" value="/" component={Link} />
+                    <Tab to="/signup" value="/signup" label="Signup" component={Link} />
+                    <Tab to="/login" value="/login" label="Login" component={Link} />
                 </Tabs>
             </Toolbar>
         </AppBar>
