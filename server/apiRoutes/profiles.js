@@ -10,10 +10,10 @@ router.post('/', async function(req, res) { // Create new profile
         try {
             const storePassword = await bcrypt.hash(req.body.password, 10);
             const newProfile = await Profiles.create({
-            name: req.body.name,
-            email: req.body.email,
-            password: storePassword   
-        });
+                name: req.body.name,
+                email: req.body.email,
+                password: storePassword   
+            });
         res.status(200).json({ id: newProfile.id, name: newProfile.name, email: newProfile.email });
         }
         catch(err){

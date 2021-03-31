@@ -1,4 +1,4 @@
-import { Button, TextField, Grid, Typography } from "@material-ui/core";
+import { Button, TextField, Grid } from "@material-ui/core";
 import React, { useState } from "react";
 import axios from 'axios';
 
@@ -21,7 +21,6 @@ export default function Loging(props) {
     }
     return(
         <React.Fragment>
-            <Typography variant="h2">Signup</Typography>
             <form onSubmit={submitHandler}>
                 <Grid container xs={12} spacing={3} xs={12}>
                     <Grid item xs={12}>
@@ -34,7 +33,7 @@ export default function Loging(props) {
                         <TextField fullWidth label="Password" type="password" onChange={event => changePassword(event.target.value)} variant="outlined" value={password} />
                     </Grid>
                     <Grid item xs={12}>
-                        <Button type="submit" style={{float: 'right', marginRight: '2.25em'}}>Submit</Button>
+                        <Button color="primary" variant="contained" type="submit" style={{float: 'right', marginRight: '2.25em'}}>Submit</Button>
                     </Grid>
                 </Grid>
             </form>
