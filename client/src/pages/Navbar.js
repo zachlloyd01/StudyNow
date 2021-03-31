@@ -4,11 +4,23 @@ import { useState } from "react";
 
 export default function NavBar(props) {
 
+    const [links, setLinks] = useState(props.links);
+
     const [value, setValue] = useState(window.location.pathname);
 
     const handleTabChange = (e, newValue) => {
         setValue(newValue);
     }
+/*
+
+    {
+        link: '/',
+        label: 'Home'
+    }
+*/
+    const navTabs = links.map((tab) => 
+        <Tab to={tab.to} label={tab.label} value={tab.to} component={Link} />
+    );
 
     return(
         <AppBar position="static" color="secondary">
@@ -20,9 +32,7 @@ export default function NavBar(props) {
                     onChange={handleTabChange}
                     style = {{ marginLeft: 'auto' }}
                 >
-                    <Tab to="/" label="Home" value="/" component={Link} />
-                    <Tab to="/signup" value="/signup" label="Signup" component={Link} />
-                    <Tab to="/login" value="/login" label="Login" component={Link} />
+                    {navTabs}    
                 </Tabs>
             </Toolbar>
         </AppBar>
