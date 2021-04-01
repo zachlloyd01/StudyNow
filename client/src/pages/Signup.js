@@ -1,6 +1,6 @@
 import { Button, TextField, Grid } from "@material-ui/core";
 import React, { useState } from "react";
-import axios from 'axios';
+import axios from '../axios.config';
 
 export default function Loging(props) {
 
@@ -11,12 +11,14 @@ export default function Loging(props) {
     const submitHandler = async function(event) {
         event.preventDefault(); // Do not reload
 
-        const data = { email, name, password }; // Data to pass to backend
-
-        let res = await axios.post('/api/profiles', data);
-
-        // TODO: Write response handler!
-        console.log(res);   
+        try {
+            const data = { email, name, password }; // Data to pass to backend
+            let res = await axios.post('/api/profiles', data);
+        }
+        catch(error) {
+            return;
+        }
+         
 
     }
     return(

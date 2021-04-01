@@ -1,12 +1,11 @@
 import './App.css';
 import { green, yellow } from "@material-ui/core/colors";
-import { Container, createMuiTheme, ThemeProvider } from '@material-ui/core';
+import { Container, createMuiTheme, ThemeProvider, Snackbar } from '@material-ui/core';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Login, Signup, Home, NavBar } from './pages';
-import axios from 'axios';
-import { useState } from 'react';
-
-axios.defaults.baseURL = "http://localhost:8080";
+import { Notifier } from "./Components";
+import { useEffect, useState } from 'react';
+import axios from "./axios.config";
 
 function App() {
 
@@ -25,13 +24,31 @@ function App() {
 
   const [navLinks, setNavLinks] = useState([]);
 
+  const [notifications, setNotifications] = useState([]);
+  
+  axios.interceptors.response.use(
+    function(response) {
+        return Promise.resolve(response);
+    },
+    function(error) {
+        console.error('error');
+        setNotifications([ { message: error, severity: 'error' } ])
+        return Promise.reject(error);
+    }
+  );
+
+
   return (
     <Router>
       <ThemeProvider theme={theme}>
         <NavBar links={navLinks} />  
+        { notifications.map(function(notification) {
+           <p>bruh</p>
+        }) }
+        <Notifier notifications={notifications}/>
         <Container style={{marginTop: '10vh'}}>
           <Switch>
-          <Route path="/" exact><Home /></Route>
+            <Route path="/" exact><Home /></Route>
             <Route path="/login"><Login /></Route>
             <Route path="/signup"><Signup /></Route>
           </Switch>
