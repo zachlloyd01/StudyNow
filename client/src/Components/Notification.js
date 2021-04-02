@@ -1,28 +1,43 @@
-import { Snackbar } from "@material-ui/core";
-import MuiAlert from '@material-ui/lab/Alert';
-import { useState } from "react";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Snackbar from "@material-ui/core/Snackbar";
+import Alert from "@material-ui/lab/Alert";
+import { toggleSnackbarClose } from "../redux/actions";
 
-function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+const Notification = () => {
+  const dispatch = useDispatch();
+    
+    const SHOW = useSelector((state) => state.toggleSnackbar);
+    const MESSAGE = useSelector((state) => state.snackbarMessage);
+    const SEVERITY = useSelector((state) => state.severity);
 
-export default function Notification(props) {
-
-    const [open, setOpen] = useState(true);
-
-    function handleClose(event, reason) {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setOpen(false);
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
     }
+    dispatch(toggleSnackbarClose());
 
-    return (
-        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-            <Alert onClose={handleClose} severity={props.severity}>
-                {props.message}
-            </Alert>
-        </Snackbar>
-    ); 
-}
+  };
+
+  
+  return (
+    <React.Fragment>
+      <Snackbar
+        open={SHOW} 
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert
+          elevation={6}
+          variant="filled"
+          onClose={handleClose}
+          severity={SEVERITY}
+        >
+            {MESSAGE}  
+        </Alert>
+      </Snackbar>
+    </React.Fragment>
+  );
+};
+
+export default Notification;

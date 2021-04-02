@@ -1,13 +1,28 @@
 import './App.css';
 import { green, yellow } from "@material-ui/core/colors";
-import { Container, createMuiTheme, ThemeProvider, Snackbar } from '@material-ui/core';
+import { Container, createMuiTheme, ThemeProvider } from '@material-ui/core';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Login, Signup, Home, NavBar } from './pages';
-import { Notifier } from "./Components";
-import { useEffect, useState } from 'react';
+import { Notification } from "./Components";
+import React, {  /* useState */ } from 'react';
+import { useDispatch } from "react-redux";
 import axios from "./axios.config";
+import { toggleSnackbarOpen } from './redux/actions';
 
 function App() {
+  const dispatch = useDispatch();
+
+  axios.interceptors.response.use(function (response) {
+    dispatch(toggleSnackbarOpen(response.data, 'success'));
+    return Promise.resolve(response);
+  }, 
+  function (error) {
+    console.error(error);
+    const errorMessage = error.message.charAt(0).toUpperCase() + error.message.slice(1);
+    dispatch(toggleSnackbarOpen(errorMessage, 'error'));
+    return Promise.reject(error);
+  });
+
 
   const theme = createMuiTheme({
     palette: {
@@ -20,32 +35,28 @@ function App() {
     }  
   });
 
-  const [loggedIn, setLoggedIn] = useState(false);
+  const navLinks = [{
+    'to': '/',
+    'label': 'home'
+  },
+  {
+    'to': '/signup',
+    'label': 'Signup'
+  },
+  {
+    'to': '/login',
+    'label': 'Login'
+  }];
 
-  const [navLinks, setNavLinks] = useState([]);
 
-  const [notifications, setNotifications] = useState([]);
   
-  axios.interceptors.response.use(
-    function(response) {
-        return Promise.resolve(response);
-    },
-    function(error) {
-        console.error('error');
-        setNotifications([ { message: error, severity: 'error' } ])
-        return Promise.reject(error);
-    }
-  );
 
 
   return (
-    <Router>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+      <Notification />
+      <Router>
         <NavBar links={navLinks} />  
-        { notifications.map(function(notification) {
-           <p>bruh</p>
-        }) }
-        <Notifier notifications={notifications}/>
         <Container style={{marginTop: '10vh'}}>
           <Switch>
             <Route path="/" exact><Home /></Route>
@@ -53,8 +64,8 @@ function App() {
             <Route path="/signup"><Signup /></Route>
           </Switch>
         </Container>
-      </ThemeProvider>
-    </Router>
+      </Router>
+    </ThemeProvider>
   );
 }
 

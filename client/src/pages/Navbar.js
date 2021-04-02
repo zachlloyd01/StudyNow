@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export default function NavBar(props) {
 
-    const [links, setLinks] = useState(props.links);
+    const links = props.links;
 
     const [value, setValue] = useState(window.location.pathname);
 

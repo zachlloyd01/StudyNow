@@ -1,6 +1,6 @@
 import { Button, TextField, Grid } from "@material-ui/core";
 import React, { useState } from "react";
-import axios from 'axios';
+import axios from '../axios.config';
 
 export default function Loging(props) {
 
@@ -10,18 +10,19 @@ export default function Loging(props) {
     const submitHandler = async function(event) {
         event.preventDefault(); // Do not reload
 
-        const data = { email, password }; // Data to pass to backend
-
-        let res = await axios.post('/api/profiles', data);
-
-        // TODO: Write response handler!
-        console.log(res);   
+        try {
+            const data = { email, password }; // Data to pass to backend
+            await axios.post('/api/profiles', data);
+        }
+        catch(error) {
+            return;
+        }
 
     }
     return(
         <React.Fragment>
             <form onSubmit={submitHandler}>
-                <Grid container xs={12} spacing={3} xs={12}>
+                <Grid container spacing={3}>
                     <Grid item xs={12}>
                         <TextField fullWidth label="Email" type="email" onChange={event => changeEmail(event.target.value)} variant="outlined" value={email} />
                     </Grid>
