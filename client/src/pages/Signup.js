@@ -13,7 +13,7 @@ export default function Loging(props) {
 
         try {
             const data = { email, name, password }; // Data to pass to backend
-            let res = await axios.post('/api/profiles', data);
+            await axios.post('/api/profiles', data);
         }
         catch(error) {
             return;
@@ -24,7 +24,7 @@ export default function Loging(props) {
     return(
         <React.Fragment>
             <form onSubmit={submitHandler}>
-                <Grid container xs={12} spacing={3} xs={12}>
+                <Grid container spacing={3}>
                     <Grid item xs={12}>
                         <TextField fullWidth label="Email" type="email" onChange={event => changeEmail(event.target.value)} variant="outlined" value={email} />
                     </Grid>

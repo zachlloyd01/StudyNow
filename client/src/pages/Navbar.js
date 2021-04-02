@@ -19,7 +19,7 @@ export default function NavBar(props) {
     }
 */
     const navTabs = links.map((tab) => 
-        <Tab to={tab.to} label={tab.label} value={tab.to} component={Link} />
+        <Tab to={tab.to} key={tab.label} label={tab.label} value={tab.to} component={Link} />
     );
 
     return(
