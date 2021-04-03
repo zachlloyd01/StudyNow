@@ -22,7 +22,7 @@ const authCheck = async function(req, res, next) {
                     const decodedRefresh = await jwt.verify(req.body.refreshToken, process.env.JWT_SECRET);
                     if(decodedRefresh.refresh === foundProfile.refreshToken) {
                         const newRefreshToken = await jwt.sign({ refresh: refreshString }, process.env.JWT_SECRET, { expiresIn: '7d' });
-                        await Profiles.update({ refreshToken, newRefreshToken }, { where: { id: foundProfile.id } });
+                        await Profiles.update({ refreshToken: newRefreshToken }, { where: { id: foundProfile.id } });
                         next();
                     }
                     else {
