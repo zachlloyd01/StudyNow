@@ -6,15 +6,19 @@ const bcrypt = require('bcrypt');
 const { ValidationError } = require('sequelize');
 
 router.post('/', async function(req, res) { // Create new profile
+    const refreshString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     if(req.body.name) { // Is a signup
         try {
             const storePassword = await bcrypt.hash(req.body.password, 10);
             const newProfile = await Profiles.create({
                 name: req.body.name,
                 email: req.body.email,
-                password: storePassword   
+                password: storePassword   ,
+                refreshToken: refreshString,
             });
-        res.status(200).json({ id: newProfile.id, name: newProfile.name, email: newProfile.email });
+            const sessionToken = await jwt.sign({ id: newProfile.id, name: newProfile.name, email: newProfile.email }, process.env.JWT_SECRET, { expiresIn: '1s' });
+            const refreshToken = await jwt.sign({ refresh: refreshString }, process.env.JWT_SECRET, { expiresIn: '7d' });
+            res.status(200).json({ sessionToken, refreshToken });
         }
         catch(err){
             console.log(err);
@@ -32,7 +36,13 @@ router.post('/', async function(req, res) { // Create new profile
             if(foundProfile) {
                 const match = await bcrypt.compare(req.body.password, foundProfile.password);
                 if(match) {
-                    res.status(200).json({ id: foundProfile.id, name: foundProfile.name, email: foundProfile.email });
+                    const sessionToken = await jwt.sign({ id: foundProfile.id, name: foundProfile.name, email: foundProfile.email }, process.env.JWT_SECRET, { expiresIn: '2h' });
+                    const refreshToken = await jwt.sign(refreshString, process.env.JWT_SECRET, { expiresIn: '7d' });
+                    await Profile.update(
+                        { refreshToken: refreshString },
+                        { where: { id: foundProfile.id } }
+                    );
+                    res.status(200).json({ sessionToken, refreshToken });
                 }
                 else {
                     res.status(401).json('Unauthorized');
